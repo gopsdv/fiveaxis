@@ -1,0 +1,47 @@
+CREATE TABLE Machine (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) UNIQUE NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE Axis (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(50) UNIQUE NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE MachineAxisRel (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    machine_id INT NOT NULL,
+    axis_id INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (machine_id) REFERENCES Machine(id) ON DELETE CASCADE,
+    FOREIGN KEY (axis_id) REFERENCES Axis(id) ON DELETE CASCADE,
+    UNIQUE (machine_id, axis_id)
+);  
+
+CREATE TABLE Field (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    machine_axis_rel_id INT NOT NULL,
+    field_name VARCHAR(255) NOT NULL,
+    field_value VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (machine_axis_rel_id) REFERENCES MachineAxisRel(id) ON DELETE CASCADE,
+    UNIQUE (machine_axis_rel_id, field_name)
+);
+
+CREATE TABLE FieldHistory (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    machine_axis_rel_id INT NOT NULL,
+    field_name VARCHAR(255) NOT NULL,
+    field_value VARCHAR(255) NOT NULL,
+    changed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    changed_by VARCHAR(255),
+    FOREIGN KEY (machine_axis_rel_id) REFERENCES MachineAxisRel(id) ON DELETE CASCADE,
+    INDEX idx_machine_axis_rel_id (machine_axis_rel_id),
+    INDEX idx_changed_at (changed_at)
+);
